@@ -1,40 +1,31 @@
 import React, { Component } from 'react';
 import PictureManager from '../PictureManager/PictureManager';
+import * as ajaxApi from '../../api/ajaxApi/ajaxApi';
 
-
-export default class Dashboard extends Component  {
-
-    constructor(props) {
-        super(props);
-        this.state = {
-            imgSrc: 'https://www.parentspartner.com/wp-content/uploads/2011/06/angry-child-boy.jpg'
-        }
-    }
+export default class Dashboard extends Component {
 
     onRenderAnalyze = (imgSrc, analyze) => {
-        this.analyze.value = analyze;
+        this.analyze.value = JSON.stringify(analyze);
         this.img.src = imgSrc;
     }
- 
-    render() {
-		return (
-			<div>
-                <PictureManager renderAnalyze={this.onRenderAnalyze} />
 
+    render() {
+        return (
+            <div>
+                <PictureManager renderAnalyze={this.onRenderAnalyze} />
                 <div id='jsonOutput'>
                     <p>Response:</p>
                     <textarea
-                        ref={(analyze) => {this.analyze = analyze;}}
+                        ref={(analyze) => { this.analyze = analyze; }}
                         className='UIInput'
                     />
                 </div>
-                <img 
+                <img
                     alt='img'
-                    ref={(img) => {this.img = img;}}
+                    ref={(img) => { this.img = img; }}
                     width='400'
                 />
-			</div>
-		)
-	}
+            </div>
+        );
+    }
 }
-

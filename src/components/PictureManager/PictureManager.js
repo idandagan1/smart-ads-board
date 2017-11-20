@@ -1,6 +1,9 @@
-import React, { Component } from 'react';
+/* global URL:true */
+import React, { Component, PropTypes } from 'react';
 import $ from 'jquery';
 import Camera from 'react-camera';
+import * as ajaxApi from '../../api/ajaxApi/ajaxApi';
+import * as utils from '../../common/utils';
 
 export default class PictureManager extends Component {
 
@@ -8,41 +11,62 @@ export default class PictureManager extends Component {
         super(props);
         this.state = {
             blob: '',
-            imgSrc: ''
+            imgSrc: '',
+        };
+    }
+
+    onPictureCapture = () => {
+        this.camera.capture()
+            .then((blob) => {
+                const src = URL.createObjectURL(blob);
+                this.setState({ imgSrc: src, blob });
+                this.processImage();
+            });
+    }
+
+    getPerson = (url) => {
+        if (!url) {
+            return;
         }
+        return new Promise((resolve, reject) => {
+            const { renderAnalyze } = this.props;
+            const { blob, imgSrc } = this.state;
+            utils.detectFace(url, blob)
+                .then((res) => {
+                    const parsedResult = JSON.parse(res.target.response);
+                    let person = null;
+                    renderAnalyze(imgSrc, parsedResult);
+                    if (parsedResult) {
+                        const { faceId } = parsedResult[0];
+                        ajaxApi.getPersonIdByFaceId(faceId)
+                            .then((result) => {
+                                debugger;
+                            });
+                    }
+                });
+        });
     }
 
     processImage = () => {
-        const { renderAnalyze } = this.props;
-        const { blob, imgSrc } = this.state;
-        const subscriptionKey = "fb87c7edb03a4449906bf0dd8e4993a1";
-        const uriBase = "https://westeurope.api.cognitive.microsoft.com/face/v1.0/detect";
-        const params = {
-            "returnFaceId": "true",
-            "returnFaceLandmarks": "false",
-            "returnFaceAttributes": "age,gender,headPose,smile,facialHair,glasses,emotion,hair,makeup,occlusion,accessories,blur,exposure,noise",
-        };
 
-        const oReq = new XMLHttpRequest();
-        const url = `${uriBase}?${$.param(params)}`;
-        oReq.open("POST", url, true);
-        oReq.setRequestHeader("Content-Type","application/octet-stream");
-        oReq.setRequestHeader("Ocp-Apim-Subscription-Key", subscriptionKey);
-        oReq.onload = function (e) {
-            renderAnalyze(imgSrc, e.target.response);
+        const uriBase = 'https://westeurope.api.cognitive.microsoft.com/face/v1.0/detect';
+        const params = {
+            returnFaceId: true,
+            returnFaceLandmarks: false,
+            returnFaceAttributes: 'age,gender,headPose,smile,facialHair,glasses,emotion,hair,makeup,occlusion,accessories,blur,exposure,noise',
         };
-        
-        oReq.send(blob);
+        const { blob } = this.state;
+        const url = `${uriBase}?${$.param(params)}`;
+        this.getPerson(url)
+            .then((person) => {
+                // TODO: get person details by personId
+                if (!person) {
+                    ajaxApi.createPerson(blob, (res) => {
+                        debugger;
+                    });
+                }
+            });
     };
-        
-    onPictureCapture = () => {
-        this.camera.capture()
-            .then(blob => {
-                const src = URL.createObjectURL(blob);
-                this.setState({ imgSrc: src, blob});
-                this.processImage();
-            })
-    }
 
     render() {
         return (
@@ -52,9 +76,13 @@ export default class PictureManager extends Component {
                         this.camera = cam;
                     }}
                 >
-                <input type="button" value="capture" onClick={this.onPictureCapture} />                    
+                    <input
+                        type='button'
+                        value='capture'
+                        onClick={this.onPictureCapture}
+                    />
                 </Camera>
-            </div>   
-        )
+            </div>
+        );
     }
 }
