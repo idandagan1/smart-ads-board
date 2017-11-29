@@ -3,9 +3,12 @@ import PictureManager from '../PictureManager/PictureManager';
 import * as ajaxApi from '../../api/ajaxApi/ajaxApi';
 
 export default class Dashboard extends Component {
-
-    onRenderAnalyze = (imgSrc) => {
-        //this.analyze.value = JSON.stringify(analyze);
+    constructor(props) {
+        super();
+        this.onRenderAnalyze = this.onRenderAnalyze.bind(this);
+    }
+    onRenderAnalyze (imgSrc, analyze){
+        this.analyze.value = JSON.stringify(analyze);
         this.img.src = imgSrc;
     }
 

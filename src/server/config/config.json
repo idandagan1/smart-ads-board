@@ -1,0 +1,10 @@
+{
+  "development": {
+    "username": "tableau_search",
+    "password": "SearchTSearch",
+    "database": "TableauDB",
+    "host": "data-services-mysql.coao2qn5lx2j.us-east-1.rds.amazonaws.com",
+    "port": 3306,
+    "dialect": "mysql"
+  }
+}
