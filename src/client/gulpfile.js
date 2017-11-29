@@ -86,7 +86,7 @@ gulp.task('webpack:dev-server', function () {
         }),
         {
             proxy: {
-                '**': `http://localhost:${3000}`
+                '**': `http://localhost:3000`
             },
             stats: {
                 colors: true,

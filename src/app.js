@@ -2,6 +2,7 @@ const  express = require('express');
 const bodyParser= require('body-parser');
 const log = require('morgan');
 const expressValidator = require('express-validator');
+const path = require('path');
 const publicPath = path.join(__dirname, '..', 'client', 'public', 'build');
 const port = process.env.PORT || 3000;
 const app = express();
