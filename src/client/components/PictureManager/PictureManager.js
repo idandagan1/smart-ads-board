@@ -6,6 +6,8 @@ import Stopwatch from 'timer-stopwatch';
 import * as ajaxApi from '../../api/ajaxApi/ajaxApi';
 import * as utils from '../../common/utils';
 
+const delay = 8000;
+
 export default class PictureManager extends Component {
 
     constructor(props) {
@@ -15,10 +17,8 @@ export default class PictureManager extends Component {
             inProccess: false,
             counter: 3,
             currentId: '',
-            candidateId: '',
         };
         setInterval(this.onPictureCapture, 3000);
-        setInterval(this.counterInterval, 1000);
     }
 
     onPictureCapture = () => {
@@ -42,32 +42,26 @@ export default class PictureManager extends Component {
     }
 
     afterImageProcess = (data) => {
-        console.log('after image proceccing');
+        console.log('capturing...');
         const { counter, currentId } = this.state;
         if (!data.Errors) {
             // Recognized face
-            // const timer = new Stopwatch(6000);
-            // timer.onDone(() => {
-            //     debugger;
-            //     console.log('Timer is complete');
-            // });
             this.setState({ inProccess: true });
+            const timer = new Stopwatch(delay);
+            timer.start();
+            timer.onDone(() => {
+                this.setState({ inProccess: false });
+            });
             if (!currentId) {
                 this.setState({ currentId: data.images[0].transaction.subject_id });
+            } else if (currentId === data.images[0].transaction.subject_id) {
+                console.log('same face for 8 sec');
             } else {
-                this.setState({ candidateId: data.images[0].transaction.subject_id });
+                this.setState({ currentId: data.images[0].transaction.subject_id });
             }
+        } else {
+            this.setState({ currentId: '' });
         }
-    }
-
-    counterInterval = () => {
-        const { counter, currentId, candidateId } = this.state;
-
-        if (counter > 6) {
-            this.setState({ inProccess: false, counter });
-        }
-
-        this.setState({ counter: counter + 1 });
     }
 
     render() {
