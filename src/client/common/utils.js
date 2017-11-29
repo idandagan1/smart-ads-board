@@ -8,7 +8,21 @@ const headers = {
 };
 
 export function processImage(image) {
-    detectPerson(image);
+    return new Promise((resolve, reject) => {
+        detectPerson(image)
+            .then((data) => {
+                const parsedData = JSON.parse(data);
+                if (parsedData.Errors) {
+                    if (parsedData.Errors[0].ErrCode !== 5002) {
+                        addPerson(image);
+                    }
+                    // console.log('user not exist:', parsedData.Errors[0].Message);
+                } else {
+                    console.log('user found!');
+                }
+                resolve(parsedData);
+            });
+    });
 }
 
 export function removeGallery() {
@@ -42,10 +56,10 @@ function addPerson(image) {
         dataType: 'text',
     }).done((data) => {
         const parsedData = JSON.parse(data);
-        ajaxApi.createPerson(parsedData)
-            .then(() => {
-                console.log('user created');
-            });
+        // ajaxApi.createPerson(parsedData)
+        //     .then(() => {
+        //         console.log('user created');
+        //     });
         return parsedData;
     });
 }
@@ -57,19 +71,15 @@ function detectPerson(image) {
         gallery_name: 'Hackathon',
     };
 
-    return $.ajax(url, {
-        headers,
-        type: 'POST',
-        data: JSON.stringify(payload),
-        dataType: 'text',
-    }).done((data) => {
-        const parsedData = JSON.parse(data);
-        if (parsedData.Errors) {
-            console.log('user not found');
-            addPerson(image);
-        } else {
-            console.log('user exist');
-        }
+    return new Promise((resolve, reject) => {
+        $.ajax(url, {
+            headers,
+            type: 'POST',
+            data: JSON.stringify(payload),
+            dataType: 'text',
+            success: (res, status, xhr) => resolve(res),
+            error: (xhr, status, error) => reject(xhr.responseJSON),
+        });
     });
 }
 
