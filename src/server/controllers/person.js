@@ -13,7 +13,7 @@ module.exports = {
      con.connect(function(err) {
        if (err) throw err;
        console.log("Connected!");
-       var sql = `CALL CreatePerson('${personId}', '${gender}', '${age}', '${glasses}');`;
+       var sql = `CALL fr_CreatePerson('${personId}', '${gender}', '${age}', '${glasses}');`;
        con.query(sql, function (err, result) {
          if (err) throw err;
          console.log("Succeeded");
