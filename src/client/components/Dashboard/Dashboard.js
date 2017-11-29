@@ -4,8 +4,8 @@ import * as ajaxApi from '../../api/ajaxApi/ajaxApi';
 
 export default class Dashboard extends Component {
 
-    onRenderAnalyze = (imgSrc, analyze) => {
-        this.analyze.value = JSON.stringify(analyze);
+    onRenderAnalyze = (imgSrc) => {
+        //this.analyze.value = JSON.stringify(analyze);
         this.img.src = imgSrc;
     }
 
