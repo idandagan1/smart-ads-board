@@ -16,7 +16,7 @@ module.exports = {
        var sql = `CALL fr_CreatePerson('${personId}', '${gender}', '${age}', '${glasses}');`;
        con.query(sql, function (err, result) {
          if (err) throw err;
-         console.log("Succeeded");
+         res.send();
        });
      });
 

@@ -21,6 +21,28 @@ function matcher(str, otherStr) {
     }
 }
 module.exports = {
+    setImpression(req, res){
+        const {person, creativeId, liked} = req.body;
+             var con = mysql.createConnection({
+               host: "data-services-mysql.coao2qn5lx2j.us-east-1.rds.amazonaws.com",
+               user: "tableau_search",
+               password: "SearchTSearch",
+               database: "TableauDB"
+             });
+
+             con.connect(function(err) {
+               if (err) throw err;
+               console.log("Connected!");
+               var sql = `CALL fr_SetImpressions(${person.personId})`;
+               con.query(sql, function (err, result) {
+                 if (err) throw err;
+                   res.send();
+                   
+                
+               });
+             });
+
+    },
     getCreative(req, res) {
         const {personId, gender, age, glasses} = req.body;
         var con = mysql.createConnection({

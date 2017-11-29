@@ -7,5 +7,6 @@ module.exports = (app) => {
 
   app.post('/api/person', person.create);
   app.post('/api/creative', creative.getCreative);
+  app.post('/api/impression', creative.setImpression)
 
 };
