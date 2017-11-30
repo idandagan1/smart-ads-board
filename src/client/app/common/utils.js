@@ -28,13 +28,13 @@ export function processImage(image) {
 export function removeGallery() {
     const url = 'https://api.kairos.com/gallery/remove';
     const payload = {
-        gallery_name,
+        gallery_name
     };
     $.ajax(url, {
         headers,
         type: 'POST',
         data: JSON.stringify(payload),
-        dataType: 'text',
+        dataType: 'text'
     }).done((response) => {
         console.log('Removed gallery successfully');
     }).catch((err) => {
@@ -42,35 +42,35 @@ export function removeGallery() {
     });
 }
 
-function addPerson(image) {
+export function addPerson(image) {
     const subject_id = uuidv4();
     const url = 'https://api.kairos.com/enroll';
     const payload = {
         image,
         subject_id,
-        gallery_name,
+        gallery_name
     };
     return $.ajax(url, {
         headers,
         type: 'POST',
         data: JSON.stringify(payload),
-        dataType: 'text',
+        dataType: 'text'
     }).done((data) => {
         const parsedData = JSON.parse(data);
-        // ajaxApi.createPerson(createPersonDate(parsedData))
-        //     .then(() => {
-        //         console.log('user created');
-        //     });
+        ajaxApi.createPerson(createPersonDate(parsedData))
+            .then(() => {
+                console.log('user created');
+            });
         return parsedData;
     });
 }
 
-function createPersonDate(person) {
+export function createPersonDate(person) {
     return person.Errors ? {} : {
         personId: person.images[0].transaction.subject_id,
         age: person.images[0].attributes.age,
         gender: person.images[0].attributes.gender.type,
-        glasses: person.images[0].attributes.glasses !== 'None',
+        glasses: person.images[0].attributes.glasses !== 'None'
     };
 }
 
@@ -78,7 +78,7 @@ function detectPerson(image) {
     const url = 'https://api.kairos.com/recognize';
     const payload = {
         image,
-        gallery_name,
+        gallery_name
     };
 
     return new Promise((resolve, reject) => {
@@ -88,19 +88,41 @@ function detectPerson(image) {
             data: JSON.stringify(payload),
             dataType: 'text',
             success: (res, status, xhr) => resolve(res),
-            error: (xhr, status, error) => reject(xhr.responseJSON),
+            error: (xhr, status, error) => reject(xhr.responseJSON)
         });
     });
 }
 
-export function getCreatives(image) {
+// export function getCreatives(image) {
+//     return new Promise((resolve, reject) => {
+//         addPerson(image)
+//             .then((res) => {
+//                 const data = createPersonDate(JSON.parse(res));
+//                 const creatives = getCreatives(createPersonDate(image));
+//                 resolve(data);
+//             });
+//     });
+// }
+
+
+export function getCreatives(person) {
     return new Promise((resolve, reject) => {
-        addPerson(image)
-            .then((res) => {
-                const data = createPersonDate(JSON.parse(res));
-                //const creatives = ajaxApi.getCreatives(createPersonDate(image));
-                resolve(data);
-            });
+        const url = 'api/creative';
+        $.ajax(url, {
+           type: 'POST',
+           data: JSON.stringify(person),
+           dataType: 'text',
+           contentType: "application/json",
+           success: (res, status, xhr) => {
+               const person = JSON.parse(res);
+               return resolve(person);
+           },
+           error: (xhr, status, error) => reject(xhr.responseJSON)
+       });
     });
+}
+
+export function setImpression(...args) {
+    ajaxApi.setImpression(args);
 }
 

@@ -13,7 +13,7 @@ import PictureManager from '../PictureManager/PictureManager';
 const showDetails = {
     display: 'inline-block',
     float: 'right',
-    margin: '63px',
+    margin: '63px'
 };
 
 export default class Dashboard extends Component {
@@ -27,7 +27,6 @@ export default class Dashboard extends Component {
         };
         this.onRenderAnalyze = this.onRenderAnalyze.bind(this);
         this.changeAd = this.changeAd.bind(this);
-        this.loadImg = this.loadImg.bind(this);
     }
 
     onRenderAnalyze(person) {
@@ -36,15 +35,13 @@ export default class Dashboard extends Component {
         persons[person.personId] = person;
         this.setState({
             persons,
-            currentPerson: person.personId,
+            currentPerson: person.personId
         });
     }
-
     changeAd(ad) {
-        $('#personDtls').css({ display: 'none' });
         let adSrc = '';
         if (typeof ad === 'string') {
-            adSrc = ad;
+            adSrc = 'https://sitecdn.adespresso.com/wp-content/uploads/2017/02/nike-facebook-ad-example.png';
         } else {
             switch (ad) {
                 case 1:
@@ -64,12 +61,7 @@ export default class Dashboard extends Component {
                     break;
             }
         }
-        $('#ad-id').fadeOut(100);
         this.setState({ adSrc });
-    }
-
-    loadImg() {
-        $('#ad-id').fadeIn(50);
     }
 
     render() {
@@ -77,20 +69,21 @@ export default class Dashboard extends Component {
 
         return (
             <div>
-                <div>
+                <div className="camera">
                     <PictureManager
                         renderAnalyze={this.onRenderAnalyze}
                         changeAd={this.changeAd}
                         markedImage={this.markedImage}
                     />
                 </div>
-                <img
-                    alt='Ads'
-                    id='ad-id'
-                    ref={(img) => { this.img = img; }}
-                    src={adSrc}
-                    onLoad={this.loadImg}
-                />
+                <div className="ad">
+                    <img
+                        alt='Ads'
+                        id='ad-id'
+                        ref={(img) => { this.img = img; }}
+                        src={adSrc}
+                    />
+                </div>
                 <div id='personDtls'>
                     <div>
                         <h1>PersonId:</h1>

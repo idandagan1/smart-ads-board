@@ -97,3 +97,5 @@ export function getCreatives(image) {
     return ajaxApi.getCreatives(createPersonDate(image));
 }
 
+
+

@@ -6,7 +6,7 @@ import * as utils from '../../common/utils';
 
 require('tracking');
 require('tracking/build/data/face');
-const delay = 10000;
+const delay = 8000;
 const intervals = 4000;
 const style = {};
 
@@ -28,10 +28,11 @@ export default class PictureManager extends Component {
         this.stopInterval = this.stopInterval.bind(this);
         this.startInterval = this.startInterval.bind(this);
         this.proseccPerson = this.proseccPerson.bind(this);
-        this.startInterval();
+
     }
 
     componentDidMount() {
+        this.startInterval();
         this.tracker = new window.tracking.ObjectTracker('face');
         this.tracker.setInitialScale(4);
         this.tracker.setStepSize(2);
@@ -59,57 +60,66 @@ export default class PictureManager extends Component {
             console.log('in process');
             return;
         }
+        console.log('capturing........');
         this.camera.capture()
             .then((blob) => {
                 reader.readAsDataURL(blob);
                 reader.onloadend = () => {
                     utils.processImage(reader.result)
                         .then((res) => {
-                            if (res.Errors) {
-                                utils.getCreatives(reader.result)
-                                    .then((person) => {
-                                        const { persons } = this.state;
-                                        persons[person.personId] = persons;
-                                        this.setState({ persons });
+                            if (res.Errors && res.Errors[0].ErrCode === 5004) {// Not Exists
+                                utils.addPerson(reader.result)
+                                    .then((personResult) => {
+                                        const person = utils.createPersonDate(JSON.parse(personResult));
                                         this.proseccPerson(person);
                                     });
-                            } else {
-                                const { persons } = this.state;
-                                this.proseccPerson(persons[res.images[0].transaction.subject_id]);
+                            } else if (res.images){
+                                this.proseccPerson({personId: res.images[0].transaction.subject_id});
                             }
                         });
                 };
             });
     }
-
     proseccPerson(person) {
-        this.setState({ isCapturing: false });
+        //this.setState({ isCapturing: false });
         const { currentId } = this.state;
         const { changeAd, renderAnalyze, markedImage } = this.props;
+        console.log('processing Person... ');
         if (person) {
-            // Recognized face
-            console.log('found face...');
+
             this.stopInterval();
-            renderAnalyze(person);
-            //const img = utils.getCreatives(data);
-            //changeAd('https://cdn.static-economist.com/sites/default/files/images/2017/06/articles/main/20170610_ldp501.jpg');
-            this.setState({ inProccess: true });
-            const timer = new Stopwatch(delay);
-            timer.start();
-            timer.onDone(() => {
-                this.startInterval();
-                this.setState({ inProccess: false, isCapturing: false });
+            utils.getCreatives(person).then((person)=> {
+                console.log('found Creatives... ');
+                renderAnalyze(person);
+                if(person.creatives){
+                    changeAd(person.creatives[0].imgName);
+                    this.setState({ inProccess: true });
+                    const timer = new Stopwatch(delay);
+                    timer.start();
+                    timer.onDone(() => {
+                        this.startInterval();
+                        this.setState({ inProccess: false, isCapturing: false });
+                    });
+                }else {
+                    this.startInterval();
+                }
+                if (!currentId) {
+                    this.setState({ currentId: person.subject_id });
+                } else if (currentId === person.subject_id) {
+                    utils.setImpression(person, person.creatives[0].creativeId, true);
+                } else {
+                    this.setState({ currentId: null});
+                    utils.setImpression(person, person.creatives[0].creativeId, false);
+                }
             });
-            if (!currentId) {
-                this.setState({ currentId: person.subject_id });
-            } else if (currentId === person.subject_id) {
-                //this.startInterval();
-            } else {
-                this.setState({ currentId: person.subject_id });
-            }
+
         } else {
             this.setState({ currentId: '' });
         }
+    }
+
+    showGif() {
+
     }
 
     stopInterval() {
@@ -130,11 +140,6 @@ export default class PictureManager extends Component {
                         this.camera = cam;
                     }}
                 >
-                    <input
-                        type='button'
-                        value='capture'
-                        onClick={this.onPictureCapture}
-                    />
                 </Camera>
             </div>
         );
