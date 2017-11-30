@@ -91,14 +91,16 @@ export default class PictureManager extends Component {
             utils.getCreatives(person).then((person)=> {
                 console.log('found Creatives... ');
                 renderAnalyze(person);
-                if(person.creatives){
-                    changeAd(person.creatives[0].imgName);
+                if(person.creatives && person.creatives.length > 0 ){
+                    const ad  = person.creatives[0].imgName;
+                    console.log('showing add' + ad);
+                    changeAd(ad);
                     this.setState({ inProccess: true });
                     const timer = new Stopwatch(delay);
                     timer.start();
                     timer.onDone(() => {
-                        this.startInterval();
                         this.setState({ inProccess: false, isCapturing: false });
+                        this.onPictureCapture();
                     });
                 }else {
                     this.startInterval();

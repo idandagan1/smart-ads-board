@@ -33,12 +33,10 @@ module.exports = {
              con.connect(function(err) {
                if (err) throw err;
                console.log("Connected!");
-               var sql = `CALL fr_SetImpressions(${person.personId})`;
+               var sql = `CALL fr_SetImpressions(${person.personId}, ${creativeId}, ${liked})`;
                con.query(sql, function (err, result) {
                  if (err) throw err;
                    res.send();
-                   
-                
                });
              });
 
