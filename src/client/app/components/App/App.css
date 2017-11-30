@@ -29,8 +29,8 @@
 
 #ad-id {
   margin: 15px;
-  width: 500px;
-  height: 400px;
+  width: 700px;
+  height: 100%;
 }
 
 @keyframes App-logo-spin {
@@ -43,3 +43,16 @@ textarea {
   height: 100px;
   resize: none;
 }
+
+video {
+  width: 300px !important;
+  height: 300px !important;
+  margin-top: 700px !important;
+  position: absolute !important;
+}
+
+#personDtls {
+  display: none;
+}
+
+
