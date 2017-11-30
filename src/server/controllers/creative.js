@@ -33,7 +33,7 @@ module.exports = {
              con.connect(function(err) {
                if (err) throw err;
                console.log("Connected!");
-               var sql = `CALL fr_SetImpressions(${person.personId}, ${creativeId}, ${liked})`;
+               var sql = `CALL fr_CreateImpressions('${person.personId}', '${creativeId}', '${liked}')`;
                con.query(sql, function (err, result) {
                  if (err) throw err;
                    res.send();
@@ -65,7 +65,7 @@ module.exports = {
                 }
                 const finalCandidate = _.reject(candidates, (canidate) => canidate.score < 1);
                 console.log("Succeeded");
-                const personWithCreative = _.assign({}, person, {creatives: _.orderBy(finalCandidate, ['score', 'creativeId'], ['asc', 'asc'])});
+                const personWithCreative = _.assign({}, person, {creatives: _.orderBy(finalCandidate, ['score', 'creativeId'], ['desc', 'asc'])});
                 res.json(personWithCreative);
             });
         }).catch((err)=> {

@@ -19,6 +19,7 @@ export default class PictureManager extends Component {
             inProccess: false,
             isCapturing: false,
             currentId: '',
+            currentCreativeId: null,
             numOfAd: 1,
             persons: [],
         };
@@ -75,6 +76,8 @@ export default class PictureManager extends Component {
                                     });
                             } else if (res.images){
                                 this.proseccPerson({personId: res.images[0].transaction.subject_id});
+                            } else {
+                                this.setState({ isCapturing: false });
                             }
                         });
                 };
@@ -82,36 +85,37 @@ export default class PictureManager extends Component {
     }
     proseccPerson(person) {
         //this.setState({ isCapturing: false });
-        const { currentId } = this.state;
+        const { currentId, currentCreative } = this.state;
         const { changeAd, renderAnalyze, markedImage } = this.props;
         console.log('processing Person... ');
+        if (!currentId && person) {
+            this.setState({ currentId: person.personId });
+        } else if (person && currentId === person.personId) {
+            utils.setImpression(person, currentCreative, true);
+        } else {
+            utils.setImpression({personId: currentId}, currentCreative, false);
+            this.setState({ currentId: null, currentCreative: null});
+        }
         if (person) {
-
             this.stopInterval();
             utils.getCreatives(person).then((person)=> {
                 console.log('found Creatives... ');
                 renderAnalyze(person);
                 if(person.creatives && person.creatives.length > 0 ){
-                    const ad  = person.creatives[0].imgName;
+                    const currentCreative = person.creatives[0];
+                    const ad  = currentCreative.imgName;
                     console.log('showing add' + ad);
                     changeAd(ad);
-                    this.setState({ inProccess: true });
+                    this.setState({ inProccess: true, currentCreative: currentCreative.creativeId});
                     const timer = new Stopwatch(delay);
                     timer.start();
                     timer.onDone(() => {
-                        this.setState({ inProccess: false, isCapturing: false });
+                        console.log('done shoning target');
+                        this.setState({ inProccess: false, isCapturing: false});
                         this.onPictureCapture();
                     });
                 }else {
                     this.startInterval();
-                }
-                if (!currentId) {
-                    this.setState({ currentId: person.subject_id });
-                } else if (currentId === person.subject_id) {
-                    utils.setImpression(person, person.creatives[0].creativeId, true);
-                } else {
-                    this.setState({ currentId: null});
-                    utils.setImpression(person, person.creatives[0].creativeId, false);
                 }
             });
 
@@ -121,7 +125,6 @@ export default class PictureManager extends Component {
     }
 
     showGif() {
-
     }
 
     stopInterval() {

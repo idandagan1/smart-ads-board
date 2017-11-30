@@ -15,13 +15,15 @@ const showDetails = {
     float: 'right',
     margin: '63px'
 };
-
+const hideDetails = {
+    display: 'none'
+};
 export default class Dashboard extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            currentPerson: 0,
+            currentPerson: {},
             persons: [{ age: '', gender: '', personId: '', glasses: '' }],
             adSrc: 'https://static.boredpanda.com/blog/wp-content/uploads/2017/01/365-days-of-print-ads-its-been-128-days-ive-been-making-print-ads-every-single-day-still-237-days-to-go-fb__700-png.jpg',
         };
@@ -30,18 +32,26 @@ export default class Dashboard extends Component {
     }
 
     onRenderAnalyze(person) {
-        $('#personDtls').css(showDetails);
-        const { persons } = this.state;
-        persons[person.personId] = person;
-        this.setState({
-            persons,
-            currentPerson: person.personId
-        });
+        if (person){
+            $('#personDtls').css(showDetails);
+            const { persons } = this.state;
+            persons[person.personId] = person;
+            this.setState({
+                persons,
+                currentPerson: person
+            });
+        } else {
+            $('#personDtls').css(hideDetails);
+            this.setState({
+                currentPerson: {}
+            });
+        }
+
     }
     changeAd(ad) {
         let adSrc = '';
         if (typeof ad === 'string') {
-            adSrc = 'https://sitecdn.adespresso.com/wp-content/uploads/2017/02/nike-facebook-ad-example.png';
+            adSrc = ad;
         } else {
             switch (ad) {
                 case 1:
@@ -66,6 +76,7 @@ export default class Dashboard extends Component {
 
     render() {
         const { adSrc, currentPerson, persons } = this.state;
+        const detailsCls = currentPerson.personId ? 'block': 'none';
 
         return (
             <div>
@@ -84,22 +95,24 @@ export default class Dashboard extends Component {
                         src={adSrc}
                     />
                 </div>
-                <div id='personDtls'>
+                <div style={{display: detailsCls}}
+
+                    id='personDtls'>
                     <div>
                         <h1>PersonId:</h1>
-                        <p>{persons[currentPerson].personId}</p>
+                        <p>{currentPerson.personId}</p>
                     </div>
                     <div>
                         <h1>Gender:</h1>
-                        <p>{persons[currentPerson].gender === 'M' ? 'Male' : 'Female'}</p>
+                        <p>{currentPerson.gender === 'M' ? 'Male' : 'Female'}</p>
                     </div>
                     <div>
                         <h1>Age:</h1>
-                        <p>{persons[currentPerson].age}</p>
+                        <p>{currentPerson.age}</p>
                     </div>
                     <div>
                         <h1>Glasses:</h1>
-                        <p>{persons[currentPerson].glasses === false ? 'False' : 'True'}</p>
+                        <p>{currentPerson.glasses === true ? 'True' : 'False'}</p>
                     </div>
                 </div>
             </div>
