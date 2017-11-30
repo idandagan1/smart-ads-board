@@ -22,7 +22,24 @@
   font-size: large;
 }
 
+#jsonOutput {
+  width: 500px;
+  margin: 0 auto;
+}
+
+#ad-id {
+  margin: 15px;
+  width: 500px;
+  height: 400px;
+}
+
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+textarea {
+  width: 100%;
+  height: 100px;
+  resize: none;
 }
